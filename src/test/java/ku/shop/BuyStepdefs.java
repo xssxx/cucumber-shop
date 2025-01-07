@@ -1,13 +1,15 @@
 package ku.shop;
 
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BuyStepdefs {
 
+    private Exception exception;
     private ProductCatalog catalog;
     private Order order;
 
@@ -24,13 +26,28 @@ public class BuyStepdefs {
 
     @When("I buy {string} with quantity {int}")
     public void i_buy_with_quantity(String name, int quantity) {
-        Product prod = catalog.getProduct(name);
-        order.addItem(prod, quantity);
+        try {
+            Product prod = catalog.getProduct(name);
+            order.addItem(prod, quantity);
+        } catch (Exception e) {
+            exception = e;
+        }
+    }
+
+    @Then("an error should be thrown")
+    public void an_error_should_be_thrown() {
+        assertInstanceOf(IllegalArgumentException.class, exception);
     }
 
     @Then("total should be {float}")
     public void total_should_be(double total) {
         assertEquals(total, order.getTotal());
+    }
+
+    @And("total of {string} in stock is {int}")
+    public void total_of_in_stock_is(String name, int stock) {
+        Product prod = catalog.getProduct(name);
+        assertEquals(stock, prod.getStock());
     }
 }
 

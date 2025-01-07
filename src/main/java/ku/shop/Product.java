@@ -12,6 +12,9 @@ public class Product {
     }
 
     public void cutStock(int quantity) {
+        if (quantity > stock) {
+            throw new IllegalArgumentException("Quantity exceeds stock");
+        }
         stock -= quantity;
     }
 
